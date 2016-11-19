@@ -1,0 +1,14 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  </head>
+  <body>
+    <button id="my-button">Click Me!</button>
+    <script src="bundle.js"></script>
+    <script>
+      btnClicks = Kefir.fromEvents(document.getElementById('my-button'), 'click');
+      btnClicks.onValue(x => console.log(x));
+    </script>
+  </body>
+</html>
+

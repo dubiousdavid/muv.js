@@ -1,0 +1,19 @@
+{
+  "name": "muv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "kefir": "^3.6.0",
+    "snabbdom": "^0.5.4"
+  },
+  "devDependencies": {
+    "rollup-plugin-commonjs": "^5.0.5",
+    "rollup-plugin-node-resolve": "^2.0.0"
+  }
+}
