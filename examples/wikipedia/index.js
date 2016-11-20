@@ -37,7 +37,7 @@ function http(url) {
 
 function eventToUrl(event){
   let query = event.target.value.trim()
-  return `http://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=${query}`
+  return `https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=${query}`
 }
 
 let effects$ = query$
