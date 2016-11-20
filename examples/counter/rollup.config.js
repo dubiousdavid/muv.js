@@ -2,12 +2,12 @@ import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
 
 export default {
-  entry: 'src/index.js',
+  entry: 'index.js',
   plugins: [
     nodeResolve(),
     commonjs()
   ],
   format: 'es',
-  dest: 'muv.js',
+  dest: 'counter.js',
   sourceMap: 'inline'
 };
