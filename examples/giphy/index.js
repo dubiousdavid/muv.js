@@ -54,11 +54,14 @@ function parseResponse({data: {image_url}}) {
 
 let effects$ = query$
   .map(topicToUrl)
-  .flatMap(http)
+  .flatMapFirst(http)
   .map(parseResponse)
+
+effects$.spy('Effects')
 
 // Reduce
 let model$ = actions$.merge(effects$).scan(update, initModel)
+model$.spy('Model')
 
 // Render
 let view$ = model$.map(view)
