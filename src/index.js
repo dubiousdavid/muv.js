@@ -6,9 +6,9 @@ import snabStyle from 'snabbdom/modules/style.js'
 import snabEvent from 'snabbdom/modules/eventlisteners.js'
 import Kefir from 'kefir'
 
-export function mkEmit(actions$) {
+export function mkEmit(stream$) {
   return function emit(action, value) {
-    return [actions$.emit, [action, value]]
+    return [stream$.emit, [action, value]]
   }
 }
 

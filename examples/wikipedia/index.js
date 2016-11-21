@@ -12,8 +12,6 @@ let initModel = []
 // Update
 function update(model, [action, value]) {
   switch (action) {
-    case 'noOp':
-      return model
     case 'results':
       return value
   }
@@ -23,7 +21,7 @@ function update(model, [action, value]) {
 function view(model) {
   let v =
     ['div', {},
-      [['input', {props: {placeholder: "Search Wikipedia"}, on: {input: query$.emit}}],
+      [ ['input', {props: {placeholder: "Search Wikipedia"}, on: {input: query$.emit}}],
         ['ul', {},
           model.map(result => ['li', {}, result])]]]
 
@@ -48,7 +46,6 @@ let effects$ = query$
 
 // Reduce
 let model$ = actions$.merge(effects$).scan(update, initModel)
-model$.log()
 
 // Render
 let view$ = model$.map(view)
