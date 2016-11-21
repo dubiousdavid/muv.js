@@ -1,8 +1,6 @@
-# muv.js
+# müv.js
 
-[Snabbdom](https://github.com/snabbdom/snabbdom) + [Kefir](http://rpominov.github.io/kefir) + ["The Elm Architecture"](https://github.com/evancz/elm-architecture-tutorial)
-
-muv.js combines the above to make frontend development simple and fun.
+müv.js incorporates [Snabbdom](https://github.com/snabbdom/snabbdom) virtual dom, [Kefir](http://rpominov.github.io/kefir) FRP, and combines them according to the model/update/view architecture found in [Elm](https://github.com/evancz/elm-architecture-tutorial).
 
 ## Examples
 
