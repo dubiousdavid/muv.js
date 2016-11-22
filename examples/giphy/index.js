@@ -7,7 +7,7 @@ let actions$ = bus()
 let query$ = bus()
 
 // Model
-let initModel = {topic: 'cats', url: 'loading.gif'}
+let initModel = {topic: 'cats', url: 'loading.gif', error: null}
 
 // Update
 function update({topic, url}, [action, value]) {
@@ -17,19 +17,19 @@ function update({topic, url}, [action, value]) {
     case 'result':
       return {topic, url: value}
     case 'error':
-      return {topic}
+      return {topic, error: value}
   }
 }
 
 // View
 function view(model) {
-  let {topic, url} = model
+  let {topic, url, error} = model
   let v =
     ['div', {},
       [ ['input', {props: {placeholder: 'Giphy Topic', value: topic}, on: {input: handleInput}}],
         ['button', {on: {click: e => query$.emit(model)}}, 'More Please!'],
         ['br'],
-        url ? ['img', {props: {src: url}}] : ['div', {}, 'Topic not found']]]
+        error ? ['div', {}, error] : ['img', {props: {src: url}}]]]
 
   return v
 }
@@ -49,13 +49,14 @@ function topicToUrl({topic}){
 }
 
 function parseResponse({data: {image_url}}) {
-  return image_url ? ['result', image_url] : ['error']
+  return image_url ? ['result', image_url] : ['error', 'No images found']
 }
 
 let effects$ = query$
   .map(topicToUrl)
   .flatMapFirst(http)
   .map(parseResponse)
+  .flatMapErrors(e => Kefir.constant(['error', e.message]))
 
 effects$.spy('Effects')
 
