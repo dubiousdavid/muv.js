@@ -6,12 +6,6 @@ import snabStyle from 'snabbdom/modules/style.js'
 import snabEvent from 'snabbdom/modules/eventlisteners.js'
 import Kefir from 'kefir'
 
-export function mkEmit(stream$) {
-  return function emit(action, value) {
-    return [stream$.emit, [action, value]]
-  }
-}
-
 export function bus() {
   let emitter
   let stream = Kefir.stream(_emitter => {
@@ -25,12 +19,6 @@ export function bus() {
   }
   return stream
 }
-
-/*
-   ['div', {},
-    [['button', { on: { click: emit('add') } }, 'Click Me!'],
-     ['span', {}, model]]]
-*/
 
 function convertToHyperScript(node) {
   let [sel, data, children] = node

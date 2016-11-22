@@ -1,14 +1,13 @@
-import { bus, render, mkEmit } from '../../src/index.js'
+import { bus, render } from '../../src/index.js'
 
 // Stream
 let actions$ = bus()
-let emit = mkEmit(actions$)
 
 // Model
 let initModel = 0
 
 // Update
-function update(model, [action]) {
+function update(model, action) {
   switch (action) {
     case 'add':
       return model + 1
@@ -19,7 +18,7 @@ function update(model, [action]) {
 
 // View
 function button(action, text) {
-  return ['button', { on: { click: emit(action) } }, text]
+  return ['button', { on: { click: [actions$.emit, action] } }, text]
 }
 
 function view(model) {

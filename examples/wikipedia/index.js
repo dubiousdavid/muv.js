@@ -33,8 +33,8 @@ function http(url) {
   return Kefir.fromNodeCallback(callback => jsonp(url, callback))
 }
 
-function eventToUrl(event){
-  let query = event.target.value.trim()
+function eventToUrl(e){
+  let query = e.target.value.trim()
   return `https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=${query}`
 }
 

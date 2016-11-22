@@ -17,6 +17,8 @@ function update({text, messages, connected}, [action, value]) {
       return {text, messages: [...messages, value], connected}
     case 'changeText':
       return {text: value, messages, connected}
+    case 'clearText':
+      return {text: '', messages, connected}
     case 'connected':
       return {text, messages, connected: value}
   }
@@ -27,7 +29,7 @@ function view({text, messages, connected}) {
   let v =
     ['div', {},
       [ ['input', {props: {placeholder: 'Send message', value: text}, on: {input: handleInput}}],
-        ['button', {props: {disabled: !connected}, on: {click: e => socketOutgoing$.emit(text)}}, 'Send'],
+        ['button', {props: {disabled: !connected}, on: {click: [handleClick, text]}}, 'Send'],
         ['span', {}, connected ? '' : ' Connecting...'],
         ['div', {style: {paddingTop: '7px'}}, messages.map(displayMessage)]]]
 
@@ -38,9 +40,14 @@ function displayMessage(msg) {
   return ['div', {}, msg]
 }
 
-function handleInput(e){
+function handleInput(e) {
   let value = e.target.value.trim()
   actions$.emit(['changeText', value])
+}
+
+function handleClick(text) {
+  actions$.emit(['clearText'])
+  socketOutgoing$.emit(text)
 }
 
 // Websocket

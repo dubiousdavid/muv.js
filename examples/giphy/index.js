@@ -27,7 +27,7 @@ function view(model) {
   let v =
     ['div', {},
       [ ['input', {props: {placeholder: 'Giphy Topic', value: topic}, on: {input: handleInput}}],
-        ['button', {on: {click: e => query$.emit(model)}}, 'More Please!'],
+        ['button', {on: {click: [query$.emit, topic]}}, 'More Please!'],
         ['br'],
         error ? ['div', {}, error] : ['img', {props: {src: url}}]]]
 
@@ -44,7 +44,7 @@ function http(url) {
   return Kefir.fromNodeCallback(callback => jsonp(url, callback))
 }
 
-function topicToUrl({topic}){
+function topicToUrl(topic){
   return `https://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=${topic}`
 }
 
