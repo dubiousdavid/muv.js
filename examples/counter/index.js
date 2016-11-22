@@ -12,22 +12,29 @@ function update(model, [action]) {
   switch (action) {
     case 'add':
       return model + 1
+    case 'subtract':
+      return model - 1
   }
 }
 
 // View
+function button(action, text) {
+  return ['button', { on: { click: emit(action) } }, text]
+}
+
 function view(model) {
   let v =
     ['div', {},
-      [['button', { on: { click: emit('add') } }, 'Click Me!'],
-        ['span', {}, ` ${model}`]]]
+      [ button('subtract', '-'),
+        ['span', {}, ` ${model} `],
+        button('add', '+')]]
 
   return v
 }
 
 // Reduce
 let model$ = actions$.scan(update, initModel)
-model$.log()
+model$.log('Model')
 
 // Render
 let view$ = model$.map(view)
