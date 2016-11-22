@@ -1,7 +1,6 @@
 import { bus, render } from '../../src/index.js'
 import Kefir from 'kefir'
-// import WebSocket from 'reconnecting-websocket'
-import WebSocket from 'robust-websocket'
+import WebSocket from 'reconnecting-websocket'
 
 // Streams
 let actions$ = bus()
