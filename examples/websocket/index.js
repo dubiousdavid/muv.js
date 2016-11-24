@@ -10,16 +10,18 @@ let socketOutgoing$ = bus()
 let initModel = {text: '', messages: [], connected: false}
 
 // Update
-function update({text, messages, connected}, [action, value]) {
+function update(model, [action, value]) {
+  let {text, messages, connected} = model
+
   switch (action) {
     case 'message':
-      return {text, messages: [...messages, value], connected}
+      return {...model, messages: [...messages, value]}
     case 'changeText':
-      return {text: value, messages, connected}
+      return {...model, text: value}
     case 'clearText':
-      return {text: '', messages, connected}
+      return {...model, text: ''}
     case 'connected':
-      return {text, messages, connected: value}
+      return {...model, connected: value}
   }
 }
 

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ava"
   },
   "author": "",
   "license": "ISC",
@@ -13,8 +13,11 @@
     "snabbdom": "^0.5.4"
   },
   "devDependencies": {
+    "ava": "^0.17.0",
     "b-jsonp": "^1.2.0",
+    "babel-plugin-transform-object-rest-spread": "^6.19.0",
     "reconnecting-websocket": "^3.0.2",
+    "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-commonjs": "^5.0.5",
     "rollup-plugin-node-resolve": "^2.0.0"
   }
