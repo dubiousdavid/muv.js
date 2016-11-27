@@ -15,7 +15,7 @@ function update(model, [action, value]) {
   switch (action) {
     case 'changeText':
       return {...model, text: value}
-    case 'add':
+    case 'addItem':
       return {...model, text: '', allCompleted: false, items: [...items, newItem(value, uid)], uid: uid + 1}
     case 'toggleItem':
       newItems = items.slice().map(item => {
@@ -28,13 +28,18 @@ function update(model, [action, value]) {
       })
       return {...model, items: newItems}
     case 'updateItem':
-      newItems = items.slice().map(item => {
-        return item.editing ? {...item, editing: false, text: value} : item
-      })
+      if (value == '') {
+        let index = items.findIndex(item => item.editing)
+        newItems = removeItem(items, items[index].id)
+      } else {
+        newItems = items.slice().map(item => {
+          return item.editing ? {...item, editing: false, text: value} : item
+        })
+      }
       return {...model, items: newItems}
-    case 'destroy':
-      newItems = items.slice().filter(item => item.id != value)
-      return {...model, items: newItems}
+    case 'removeItem':
+      newItems = removeItem(items, value)
+      return {...model, items: newItems, allCompleted: allItemsCompleted(newItems)}
     case 'toggleAll':
       let newAllCompleted = !allCompleted
 
@@ -45,8 +50,12 @@ function update(model, [action, value]) {
   }
 }
 
+function removeItem(items, id) {
+  return items.slice().filter(item => item.id != id)
+}
+
 function allItemsCompleted(items) {
-  return items.filter(item => item.completed).length == items.length
+  return items.findIndex(item => !item.completed) == -1
 }
 
 function newItem(text, id) {
@@ -80,9 +89,10 @@ function handleInput(e) {
 function onEnter(e) {
   if (e.code == 'Enter') {
     let text = e.target.value.trim()
-    actions$.emit(['add', text])
+    actions$.emit(['addItem', text])
   }
 }
+
 function main({items, allCompleted}) {
   let v =
     ['section.main', {},
@@ -134,7 +144,7 @@ function checkboxClick(id) {
 }
 
 function destroyClick(id) {
-  actions$.emit(['destroy', id])
+  actions$.emit(['removeItem', id])
 }
 
 function numUncompleted(items) {
@@ -162,9 +172,9 @@ function info() {
     ['footer.info', {},
       [ ['p', {}, 'Double-click to edit a todo'],
         ['p', {},
-          ['Template by ', ['a', {props: {href: 'http://sindresorhus.com'}}, 'Sindre Sorhus']]],
+          ['Created by ', ['a', {props: {href: 'http://todomvc.com'}}, 'David Sargeant']]],
         ['p', {},
-          ['Created by ', ['a', {props: {href: 'https://github.com/dubiousdavid'}}, 'David Sargeant']]]]]
+          ['Part of ', ['a', {props: {href: 'http://todomvc.com'}}, 'TodoMVC']]]]]
   return v
 }
 
