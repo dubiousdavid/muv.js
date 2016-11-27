@@ -21,13 +21,15 @@ export function bus() {
 }
 
 function convertToHyperScript(node) {
-  let [sel, data, children] = node
+  if (Array.isArray(node)) {
+    let [sel, data, children] = node
 
-  if (Array.isArray(children)) {
-    return h(sel, data, children.map(convertToHyperScript))
-  } else {
+    if (Array.isArray(children)) {
+      return h(sel, data, children.map(convertToHyperScript))
+    }
     return h.apply(null, node)
   }
+  return node
 }
 
 export function render(view$, container) {

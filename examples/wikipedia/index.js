@@ -21,7 +21,7 @@ function update(model, [action, value]) {
 function view(model) {
   let v =
     ['div', {},
-      [ ['input', {props: {placeholder: 'Search Wikipedia'}, on: {input: query$.emit}}],
+      [ ['input', {props: {placeholder: 'Search Wikipedia', autofocus: true}, on: {input: query$.emit}}],
         ['ul', {},
           model.map(result => ['li', {}, result])]]]
 

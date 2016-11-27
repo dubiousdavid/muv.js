@@ -29,12 +29,17 @@ function update(model, [action, value]) {
 function view({text, messages, connected}) {
   let v =
     ['div', {},
-      [ ['input', {props: {placeholder: 'Send message', value: text}, on: {input: handleInput}}],
+      [ ['input', {props: {placeholder: 'Send message', autofocus: true, value: text},
+                   on: {input: handleInput}, hook: {postpatch: focusElement}}],
         ['button', {props: {disabled: !connected}, on: {click: [handleClick, text]}}, 'Send'],
         ['span', {}, connected ? '' : ' Connecting...'],
         ['div', {style: {paddingTop: '7px'}}, messages.map(displayMessage)]]]
 
   return v
+}
+
+function focusElement(oldVnode, vnode) {
+  return vnode.elm.focus()
 }
 
 function displayMessage(msg) {
