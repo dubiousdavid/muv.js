@@ -192,6 +192,7 @@ function numCompleted(items) {
 
 function footer({items, filter}) {
   let numLeft = numUncompleted(items)
+  let numDone = numCompleted(items)
 
   let v =
     ['footer.footer', {},
@@ -201,8 +202,8 @@ function footer({items, filter}) {
           [ viewFilter('#/', 'all', filter),
             viewFilter('#/active', 'active', filter),
             viewFilter('#/completed', 'completed', filter)]],
-        numCompleted(items) >= 1 ?
-          ['button.clear-completed', {on: {click: clearCompleted}}, 'Clear Completed'] :
+        numDone >= 1 ?
+          ['button.clear-completed', {on: {click: clearCompleted}}, `Clear Completed (${numDone})`] :
           '']]
   return v
 }
