@@ -78,7 +78,7 @@ function removeItem(items, id) {
 }
 
 function allItemsCompleted(items) {
-  return items.findIndex(item => !item.completed) == -1
+  return items.every(item => item.completed)
 }
 
 function newItem(text, id) {
