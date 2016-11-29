@@ -5,7 +5,25 @@ import Kefir from 'kefir'
 let actions$ = bus()
 
 // Model
-let initModel = {items: [], allCompleted: false, filter: 'All', text: '', uid: 0}
+function getFromStorage() {
+  let json = localStorage.getItem('todos-muvjs')
+  if (json) {
+    return JSON.parse(json)
+  }
+}
+
+function getFilterFromHash() {
+  let hash = location.hash
+  let filter
+
+  if (hash) {
+    filter = hash.slice(2)
+  }
+  return !filter ? 'all' : filter
+}
+
+let initModel = getFromStorage() ||
+  {items: [], allCompleted: false, filter: getFilterFromHash(), text: '', uid: 0}
 
 // Update
 function update(model, [action, value]) {
@@ -18,12 +36,12 @@ function update(model, [action, value]) {
     case 'addItem':
       return {...model, text: '', allCompleted: false, items: [...items, newItem(value, uid)], uid: uid + 1}
     case 'toggleItem':
-      newItems = items.slice().map(item => {
+      newItems = items.map(item => {
         return item.id == value ? {...item, completed: !item.completed} : item
       })
       return {...model, items: newItems, allCompleted: allItemsCompleted(newItems)}
     case 'editItem':
-      newItems = items.slice().map(item => {
+      newItems = items.map(item => {
         return item.id == value ? {...item, editing: true} : item
       })
       return {...model, items: newItems}
@@ -32,7 +50,7 @@ function update(model, [action, value]) {
         let index = items.findIndex(item => item.editing)
         newItems = removeItem(items, items[index].id)
       } else {
-        newItems = items.slice().map(item => {
+        newItems = items.map(item => {
           return item.editing ? {...item, editing: false, text: value} : item
         })
       }
@@ -43,15 +61,20 @@ function update(model, [action, value]) {
     case 'toggleAll':
       let newAllCompleted = !allCompleted
 
-      newItems = items.slice().map(item => {
+      newItems = items.map(item => {
         return {...item, completed: newAllCompleted}
       })
       return {...model, items: newItems, allCompleted: newAllCompleted}
+    case 'changeFilter':
+      return {...model, filter: value}
+    case 'clearCompleted':
+      newItems = items.filter(item => !item.completed)
+      return {...model, items: newItems}
   }
 }
 
 function removeItem(items, id) {
-  return items.slice().filter(item => item.id != id)
+  return items.filter(item => item.id != id)
 }
 
 function allItemsCompleted(items) {
@@ -93,12 +116,24 @@ function onEnter(e) {
   }
 }
 
-function main({items, allCompleted}) {
+
+function main({items, filter, allCompleted}) {
+  function isVisible(item) {
+    switch (filter) {
+      case 'all':
+        return true
+      case 'completed':
+        return item.completed
+      case 'active':
+        return !item.completed
+    }
+  }
+
   let v =
     ['section.main', {},
       [ ['input.toggle-all', {props: {type: 'checkbox', checked: allCompleted}, on: {click: toggleAll}}],
         ['label', {props: {htmlFor: 'toggle-all'}}, 'Mark all as complete'],
-        ['ul.todo-list', {}, items.map(viewItem)]]]
+        ['ul.todo-list', {}, items.filter(isVisible).map(viewItem)]]]
   return v
 }
 
@@ -151,19 +186,35 @@ function numUncompleted(items) {
   return items.filter(item => !item.completed).length
 }
 
+function numCompleted(items) {
+  return items.filter(item => item.completed).length
+}
+
 function footer({items, filter}) {
   let numLeft = numUncompleted(items)
+
   let v =
     ['footer.footer', {},
       [ ['span.todo-count', {},
           [['strong', {}, `${numLeft} item${numLeft == 1 ? '' : 's'} left`]]],
         ['ul.filters', {},
-          [ ['li', {},
-              [ ['a', {props: {href: '#/'}, class: {selected: filter == 'All'}}, 'All']]],
-            ['li', {},
-              [ ['a', {props: {href: '#/active'}, class: {selected: filter == 'Active'}}, 'Active']]],
-            ['li', {},
-              [ ['a', {props: {href: '#/completed'}, class: {selected: filter == 'Completed'}}, 'Completed']]]]]]]
+          [ viewFilter('#/', 'all', filter),
+            viewFilter('#/active', 'active', filter),
+            viewFilter('#/completed', 'completed', filter)]],
+        numCompleted(items) >= 1 ?
+          ['button.clear-completed', {on: {click: clearCompleted}}, 'Clear Completed'] :
+          '']]
+  return v
+}
+
+function clearCompleted(e) {
+  actions$.emit(['clearCompleted'])
+}
+
+function viewFilter(href, filter, currentFilter) {
+  let v =
+    ['li', {},
+      [ ['a', {props: {href: href}, class: {selected: filter == currentFilter}}, filter]]]
   return v
 }
 
@@ -181,6 +232,25 @@ function info() {
 // Reduce
 let model$ = actions$.scan(update, initModel)
 model$.log()
+
+// Save to local storage
+function disableEditing(model) {
+  let newItems = model.items.map(item => {
+    return {...item, editing: false}
+  })
+  return {...model, items: newItems}
+}
+
+model$
+  .map(disableEditing)
+  .onValue(model => localStorage.setItem('todos-muvjs', JSON.stringify(model)))
+
+// Handle hash change
+function changeFilter() {
+  actions$.emit(['changeFilter', getFilterFromHash()])
+}
+
+window.onhashchange = changeFilter
 
 // Render
 let view$ = model$.map(view)
