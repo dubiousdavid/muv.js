@@ -224,7 +224,7 @@ function info() {
     ['footer.info', {},
       [ ['p', {}, 'Double-click to edit a todo'],
         ['p', {},
-          ['Created by ', ['a', {props: {href: 'http://todomvc.com'}}, 'David Sargeant']]],
+          ['Created by ', ['a', {props: {href: 'https://github.com/dubiousdavid'}}, 'David Sargeant']]],
         ['p', {},
           ['Part of ', ['a', {props: {href: 'http://todomvc.com'}}, 'TodoMVC']]]]]
   return v
