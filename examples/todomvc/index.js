@@ -118,10 +118,9 @@ function handleInput(e) {
 function onEnter(e) {
   if (e.code == 'Enter') {
     let text = e.target.value.trim()
-    actions$.emit(['addItem', text])
+    if (text !== '') actions$.emit(['addItem', text])
   }
 }
-
 
 function main({items, filter, allCompleted}) {
   function isVisible(item) {
