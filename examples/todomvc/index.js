@@ -3,6 +3,7 @@ import Kefir from 'kefir'
 
 // Streams
 let actions$ = bus()
+actions$.log('Actions')
 
 // Model
 function getFromStorage() {
@@ -45,16 +46,21 @@ function update(model, [action, value]) {
         return item.id == value ? {...item, editing: true} : item
       })
       return {...model, items: newItems}
+    case 'cancelEdit':
+      newItems = items.map(item => {
+        return item.editing ? {...item, editing: false} : item
+      })
+      return {...model, items: newItems}
     case 'updateItem':
       if (value == '') {
         let index = items.findIndex(item => item.editing)
-        newItems = removeItem(items, items[index].id)
+        newItems = index == -1 ? items : removeItem(items, items[index].id)
       } else {
         newItems = items.map(item => {
           return item.editing ? {...item, editing: false, text: value} : item
         })
       }
-      return {...model, items: newItems}
+      return items != newItems ? {...model, items: newItems} : model
     case 'removeItem':
       newItems = removeItem(items, value)
       return {...model, items: newItems, allCompleted: allItemsCompleted(newItems)}
@@ -150,18 +156,25 @@ function viewItem(item) {
                               on: {click: [checkboxClick, id]}}],
             ['label', {on: {dblclick: [itemClick, id]}}, text],
             ['button.destroy', {on: {click: [destroyClick, id]}}]]],
-        ['input.edit', {props: {value: text}, on: {keydown: onEditDone, blur: onBlur}, hook: {postpatch: focusElement}}]]]
+        ['input.edit', {props: {value: editing ? text : ''},
+                        on: {keydown: onEditDone, blur: onBlur},
+                        hook: {postpatch: focusElement}}]]]
   return v
 }
 
 function focusElement(oldVnode, vnode) {
-  return vnode.elm.focus()
+  vnode.elm.focus()
 }
 
 function onEditDone(e) {
-  if (e.code == 'Enter' || e.code == 'Escape') {
-    let text = e.target.value.trim()
-    actions$.emit(['updateItem', text])
+  switch (e.code){
+    case 'Enter':
+      let text = e.target.value.trim()
+      actions$.emit(['updateItem', text])
+      break
+    case 'Escape':
+      actions$.emit(['cancelEdit'])
+      break
   }
 }
 
@@ -232,7 +245,7 @@ function info() {
 
 // Reduce
 let model$ = actions$.scan(update, initModel)
-model$.log()
+model$.log('Model')
 
 // Save to local storage
 function disableEditing(model) {
