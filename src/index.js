@@ -4,21 +4,6 @@ import snabClass from 'snabbdom/modules/class.js'
 import snabProps from 'snabbdom/modules/props.js'
 import snabStyle from 'snabbdom/modules/style.js'
 import snabEvent from 'snabbdom/modules/eventlisteners.js'
-import Kefir from 'kefir'
-
-export function bus() {
-  let emitter
-  let stream = Kefir.stream(_emitter => {
-    emitter = _emitter
-    return function() {
-      emitter = null
-    }
-  })
-  stream.emit = function(x) {
-    emitter && emitter.emit(x)
-  }
-  return stream
-}
 
 function convertToHyperScript(node) {
   if (Array.isArray(node)) {
@@ -38,7 +23,7 @@ export function render(view$, container) {
 
   view$
     .map(convertToHyperScript)
-    .onValue(newVnode => {
+    .subscribe(newVnode => {
       patch(vnode, newVnode)
       vnode = newVnode
     })

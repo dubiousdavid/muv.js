@@ -1,6 +1,6 @@
 # müv.js
 
-müv.js incorporates [Snabbdom](https://github.com/snabbdom/snabbdom) virtual dom, [Kefir](http://rpominov.github.io/kefir) FRP, and combines them according to the model/update/view architecture found in [Elm](https://github.com/evancz/elm-architecture-tutorial).
+müv.js incorporates [Snabbdom](https://github.com/snabbdom/snabbdom) virtual dom, FRP (e.g., [RxJs](http://reactivex.io/)), and combines them according to the model/update/view architecture found in [Elm](https://github.com/evancz/elm-architecture-tutorial).
 
 ## Examples
 
@@ -15,10 +15,11 @@ müv.js incorporates [Snabbdom](https://github.com/snabbdom/snabbdom) virtual do
 HTML is represented using arrays, which are automatically converted to hyperscript.
 
 ```Javascript
-import { bus, render } from '../../src/index.js'
+import { render } from '../../src/index.js'
+import Rx from 'rxjs/Rx'
 
 // Stream
-let actions$ = bus()
+let actions$ = new Rx.Subject()
 
 // Model
 let initModel = 0
@@ -35,7 +36,7 @@ function update(model, action) {
 
 // View
 function button(action, text) {
-  return ['button', { on: { click: [actions$.emit, action] } }, text]
+  return ['button', { on: { click: e => actions$.next(action) } }, text]
 }
 
 function view(model) {
@@ -49,8 +50,9 @@ function view(model) {
 }
 
 // Reduce
-let model$ = actions$.scan(update, initModel)
-model$.log('Model')
+let model$ = actions$
+  .scan(update, initModel)
+  .startWith(initModel)
 
 // Render
 let view$ = model$.map(view)

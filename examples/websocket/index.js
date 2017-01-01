@@ -1,10 +1,10 @@
-import { bus, render } from '../../src/index.js'
-import Kefir from 'kefir'
+import { render } from '../../src/index.js'
 import WebSocket from 'reconnecting-websocket'
+import Rx from 'rxjs/Rx'
 
 // Streams
-let actions$ = bus()
-let socketOutgoing$ = bus()
+let actions$ = new Rx.Subject()
+let socketOutgoing$ = new Rx.Subject()
 
 // Model
 let initModel = {text: '', messages: [], connected: false}
@@ -48,42 +48,51 @@ function displayMessage(msg) {
 
 function handleInput(e) {
   let value = e.target.value.trim()
-  actions$.emit(['changeText', value])
+  actions$.next(['changeText', value])
 }
 
 function handleClick(text) {
-  actions$.emit(['clearText'])
-  socketOutgoing$.emit(text)
+  actions$.next(['clearText'])
+  socketOutgoing$.next(text)
 }
 
 // Websocket
 let ws = new WebSocket('wss://echo.websocket.org')
 
-let online$ = Kefir.fromPoll(500, () => navigator.onLine).skipDuplicates()
+let online$ = Rx.Observable.interval(500)
+  .map(() => navigator.onLine)
+  .distinctUntilChanged()
 
-let socketConnected$ = Kefir.stream(emitter => {
-  ws.onopen = () => emitter.emit(true)
-  ws.onclose = () => emitter.emit(false)
+let socketConnected$ = Rx.Observable.create(subscriber => {
+  ws.onopen = () => subscriber.next(true)
+  ws.onclose = () => subscriber.next(false)
 })
 
 let connected$ = socketConnected$
-  .combine(online$, (connected, online) => connected && online)
-  .toProperty(() => false)
+  .combineLatest(online$, (connected, online) => connected && online)
+  .publishBehavior(false)
+  .refCount()
 
-socketOutgoing$.filterBy(connected$).onValue(ws.send)
+socketOutgoing$
+  .withLatestFrom(connected$, (msg, connected) => [msg, connected])
+  .filter(([, connected]) => connected)
+  .subscribe(([msg]) => ws.send(msg))
 
-let socketIncoming$ = Kefir.stream(emitter => {
-  ws.onmessage = emitter.emit
+let socketIncoming$ = Rx.Observable.create(subscriber => {
+  ws.onmessage = msg => subscriber.next(msg)
 })
 
 let effects$ = socketIncoming$
   .map(msgEvent => ['message', msgEvent.data])
   .merge(connected$.map(connected => ['connected', connected]))
-effects$.log('Effects')
 
 // Reduce
-let model$ = actions$.merge(effects$).scan(update, initModel)
-model$.log('Model')
+let model$ = actions$
+  .merge(effects$)
+  .do(x => console.log('Actions', x))
+  .scan(update, initModel)
+  .startWith(initModel)
+  .do(x => console.log('Model', x))
 
 // Render
 let view$ = model$.map(view)

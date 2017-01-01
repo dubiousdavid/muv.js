@@ -1,10 +1,10 @@
-import { bus, render } from '../../src/index.js'
-import Kefir from 'kefir'
+import { render } from '../../src/index.js'
+import Rx from 'rxjs/Rx'
 import jsonp from 'b-jsonp'
 
 // Streams
-let actions$ = bus()
-let query$ = bus()
+let actions$ = new Rx.Subject()
+let query$ = new Rx.Subject()
 
 // Model
 let initModel = {topic: 'cats', url: 'loading.gif', error: null}
@@ -27,7 +27,7 @@ function view(model) {
   let v =
     ['div', {},
       [ ['input', {props: {placeholder: 'Giphy Topic', value: topic}, on: {input: handleInput}}],
-        ['button', {on: {click: [query$.emit, topic]}}, 'More Please!'],
+        ['button', {on: {click: e => query$.next(topic)}}, 'More Please!'],
         ['br'],
         error ? ['div', {}, error] : ['img', {props: {src: url}}]]]
 
@@ -36,13 +36,11 @@ function view(model) {
 
 function handleInput(e){
   let value = e.target.value.trim()
-  actions$.emit(['changeTopic', value])
+  actions$.next(['changeTopic', value])
 }
 
 // Http
-function http(url) {
-  return Kefir.fromNodeCallback(callback => jsonp(url, callback))
-}
+let http = Rx.Observable.bindNodeCallback(jsonp)
 
 function topicToUrl(topic){
   return `https://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=${topic}`
@@ -53,20 +51,20 @@ function parseResponse({data: {image_url}}) {
 }
 
 let effects$ = query$
+  .startWith(initModel.topic)
   .map(topicToUrl)
-  .flatMapFirst(http)
+  .switchMap(http)
   .map(parseResponse)
-  .flatMapErrors(e => Kefir.constant(['error', e.message]))
-
-effects$.spy('Effects')
+  .catch(e => Rx.Observable.of(['error', e.message]))
 
 // Reduce
-let model$ = actions$.merge(effects$).scan(update, initModel)
-model$.spy('Model')
+let model$ = actions$
+  .merge(effects$)
+  .do(x => console.log('Actions', x))
+  .scan(update, initModel)
+  .startWith(initModel)
+  .do(x => console.log('Model', x))
 
 // Render
 let view$ = model$.map(view)
 render(view$, document.getElementById('container'))
-
-// Init
-query$.emit(initModel)

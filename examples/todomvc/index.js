@@ -1,9 +1,8 @@
-import { bus, render } from '../../src/index.js'
-import Kefir from 'kefir'
+import { render } from '../../src/index.js'
+import Rx from 'rxjs/Rx'
 
 // Streams
-let actions$ = bus()
-actions$.log('Actions')
+let actions$ = new Rx.Subject()
 
 // Model
 function getFromStorage() {
@@ -112,13 +111,13 @@ function view(model) {
 
 function handleInput(e) {
   let value = e.target.value.trim()
-  actions$.emit(['changeText', value])
+  actions$.next(['changeText', value])
 }
 
 function onEnter(e) {
   if (e.code == 'Enter') {
     let text = e.target.value.trim()
-    if (text !== '') actions$.emit(['addItem', text])
+    if (text !== '') actions$.next(['addItem', text])
   }
 }
 
@@ -143,7 +142,7 @@ function main({items, filter, allCompleted}) {
 }
 
 function toggleAll() {
-  actions$.emit(['toggleAll'])
+  actions$.next(['toggleAll'])
 }
 
 function viewItem(item) {
@@ -169,29 +168,29 @@ function onEditDone(e) {
   switch (e.code){
     case 'Enter':
       let text = e.target.value.trim()
-      actions$.emit(['updateItem', text])
+      actions$.next(['updateItem', text])
       break
     case 'Escape':
-      actions$.emit(['cancelEdit'])
+      actions$.next(['cancelEdit'])
       break
   }
 }
 
 function onBlur(e) {
   let text = e.target.value.trim()
-  actions$.emit(['updateItem', text])
+  actions$.next(['updateItem', text])
 }
 
 function itemClick(id) {
-  actions$.emit(['editItem', id])
+  actions$.next(['editItem', id])
 }
 
 function checkboxClick(id) {
-  actions$.emit(['toggleItem', id])
+  actions$.next(['toggleItem', id])
 }
 
 function destroyClick(id) {
-  actions$.emit(['removeItem', id])
+  actions$.next(['removeItem', id])
 }
 
 function numUncompleted(items) {
@@ -221,7 +220,7 @@ function footer({items, filter}) {
 }
 
 function clearCompleted(e) {
-  actions$.emit(['clearCompleted'])
+  actions$.next(['clearCompleted'])
 }
 
 function viewFilter(href, filter, currentFilter) {
@@ -243,8 +242,12 @@ function info() {
 }
 
 // Reduce
-let model$ = actions$.scan(update, initModel)
-model$.log('Model')
+let model$ = actions$
+  .do(x => console.log('Actions', x))
+  .scan(update, initModel)
+  .do(x => console.log('Model', x))
+  .publishBehavior(initModel)
+  .refCount()
 
 // Save to local storage
 function disableEditing(model) {
@@ -256,11 +259,11 @@ function disableEditing(model) {
 
 model$
   .map(disableEditing)
-  .onValue(model => localStorage.setItem('todos-muvjs', JSON.stringify(model)))
+  .subscribe(model => localStorage.setItem('todos-muvjs', JSON.stringify(model)))
 
 // Handle hash change
 function changeFilter() {
-  actions$.emit(['changeFilter', getFilterFromHash()])
+  actions$.next(['changeFilter', getFilterFromHash()])
 }
 
 window.onhashchange = changeFilter
