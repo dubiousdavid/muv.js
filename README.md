@@ -10,6 +10,10 @@ müv.js incorporates [Snabbdom](https://github.com/snabbdom/snabbdom) virtual do
 4. [Websocket](https://dubiousdavid.github.io/muv.js/examples/websocket/) ([source](https://github.com/dubiousdavid/muv.js/blob/master/examples/websocket/index.js))
 5. [TodoMVC](https://dubiousdavid.github.io/muv.js/examples/todomvc/) ([source](https://github.com/dubiousdavid/muv.js/blob/master/examples/todomvc/index.js))
 
+## What FRP libraries can I use?
+
+Any library with a subscribe method.
+
 ## What it looks like
 
 HTML is represented using arrays, which are automatically converted to hyperscript.
