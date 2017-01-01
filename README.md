@@ -12,7 +12,7 @@ müv.js incorporates [Snabbdom](https://github.com/snabbdom/snabbdom) virtual do
 
 ## What FRP libraries can I use?
 
-Any library with a subscribe method.
+Any library with a `subscribe` method.
 
 ## What it looks like
 
