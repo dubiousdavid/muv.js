@@ -5,7 +5,7 @@ import snabProps from 'snabbdom/modules/props.js'
 import snabStyle from 'snabbdom/modules/style.js'
 import snabEvent from 'snabbdom/modules/eventlisteners.js'
 
-function convertToHyperScript(node) {
+export function convertToHyperScript(node) {
   if (Array.isArray(node)) {
     let [sel, data, children] = node
 

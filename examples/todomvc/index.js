@@ -5,6 +5,9 @@ import Rx from 'rxjs/Rx'
 let actions$ = new Rx.Subject()
 
 // Model
+let initModel = getFromStorage() ||
+  {items: [], allCompleted: false, filter: getFilterFromHash(), text: '', uid: 0}
+
 function getFromStorage() {
   let json = localStorage.getItem('todos-muvjs')
   if (json) {
@@ -21,9 +24,6 @@ function getFilterFromHash() {
   }
   return !filter ? 'all' : filter
 }
-
-let initModel = getFromStorage() ||
-  {items: [], allCompleted: false, filter: getFilterFromHash(), text: '', uid: 0}
 
 // Update
 function update(model, [action, value]) {
@@ -193,17 +193,9 @@ function destroyClick(id) {
   actions$.next(['removeItem', id])
 }
 
-function numUncompleted(items) {
-  return items.filter(item => !item.completed).length
-}
-
-function numCompleted(items) {
-  return items.filter(item => item.completed).length
-}
-
 function footer({items, filter}) {
-  let numLeft = numUncompleted(items)
   let numDone = numCompleted(items)
+  let numLeft = items.length - numDone
 
   let v =
     ['footer.footer', {},
@@ -217,6 +209,10 @@ function footer({items, filter}) {
           ['button.clear-completed', {on: {click: clearCompleted}}, `Clear Completed (${numDone})`] :
           '']]
   return v
+}
+
+function numCompleted(items) {
+  return items.filter(item => item.completed).length
 }
 
 function clearCompleted(e) {
@@ -250,6 +246,10 @@ let model$ = actions$
   .refCount()
 
 // Save to local storage
+model$
+  .map(disableEditing)
+  .subscribe(model => localStorage.setItem('todos-muvjs', JSON.stringify(model)))
+
 function disableEditing(model) {
   let newItems = model.items.map(item => {
     return {...item, editing: false}
@@ -257,16 +257,12 @@ function disableEditing(model) {
   return {...model, items: newItems}
 }
 
-model$
-  .map(disableEditing)
-  .subscribe(model => localStorage.setItem('todos-muvjs', JSON.stringify(model)))
-
 // Handle hash change
+window.onhashchange = changeFilter
+
 function changeFilter() {
   actions$.next(['changeFilter', getFilterFromHash()])
 }
-
-window.onhashchange = changeFilter
 
 // Render
 let view$ = model$.map(view)

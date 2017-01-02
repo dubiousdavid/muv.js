@@ -18,7 +18,3 @@ export function routeActions(mapping) {
     }
   }
 }
-
-export function convertToHtml(v) {
-
-}
