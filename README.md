@@ -14,13 +14,7 @@ Draws inspiration from: [Elm](https://github.com/evancz/elm-architecture-tutoria
 
 ## What FRP libraries can I use?
 
-Any library with a `subscribe` method. Here are a few:
-
-* [RxJs](http://reactivex.io/)
-* [Bacon.js](https://baconjs.github.io/)
-* [Kefir](http://rpominov.github.io/kefir)
-* [xstream](http://staltz.com/xstream/)
-* [Most](https://github.com/cujojs/most)
+Any library with a `subscribe` method. Here are a few: [RxJs](http://reactivex.io/), [Bacon.js](https://baconjs.github.io/), [Kefir](http://rpominov.github.io/kefir), [xstream](http://staltz.com/xstream/), [Most](https://github.com/cujojs/most)
 
 ## What it looks like
 
