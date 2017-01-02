@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Elm-inspired FRP Javascript Library",
   "scripts": {
-    "test": "ava"
+    "test": "ava --verbose",
+    "pretest": "rollup -c"
   },
   "author": "David Sargeant",
   "license": "ISC",
