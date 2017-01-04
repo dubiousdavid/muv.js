@@ -1,8 +1,11 @@
 # müv.js
 
-müv.js incorporates [Snabbdom](https://github.com/snabbdom/snabbdom) virtual dom, FRP (e.g., [RxJs](http://reactivex.io/)), and combines them according to the model/update/view architecture found in [Elm](https://github.com/evancz/elm-architecture-tutorial).
+müv.js is a small library for building reactive web apps.
 
-Draws inspiration from: [Elm](https://github.com/evancz/elm-architecture-tutorial), [Cycle.js](https://cycle.js.org/), and [Redux](http://redux.js.org/)
+
+## Introduction
+
+müv.js is intentionally simple. You could write it yourself. The hard work was done by the authors of [Snabbdom](https://github.com/snabbdom/snabbdom) virtual dom and functional reactive programming libraries like [RxJs](http://reactivex.io/). The trick is understanding how to compose these two things in order to build complex applications. The pattern for data flow and state change takes inspiration from the model/update/view architecture found in [Elm](https://github.com/evancz/elm-architecture-tutorial).
 
 ## Examples
 
@@ -16,7 +19,7 @@ Draws inspiration from: [Elm](https://github.com/evancz/elm-architecture-tutoria
 
 Any library with a `subscribe` method. Here are a few: [RxJs](http://reactivex.io/), [Bacon.js](https://baconjs.github.io/), [Kefir](http://rpominov.github.io/kefir), [xstream](http://staltz.com/xstream/), [Most](https://github.com/cujojs/most)
 
-## What it looks like
+## What does it look like?
 
 HTML is represented using arrays. For example:
 
@@ -79,3 +82,8 @@ let model$ = actions$
 let view$ = model$.map(view)
 render(view$, document.getElementById('container'))
 ```
+
+## FAQ
+
+Q: What projects have you drawn inspiration from?
+A: [Elm](https://github.com/evancz/elm-architecture-tutorial), [Cycle.js](https://cycle.js.org/), and [Redux](http://redux.js.org/)
