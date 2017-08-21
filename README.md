@@ -29,9 +29,9 @@ HTML is represented using arrays. For example:
 
 ```javascript
 ['ul#frp-list', {},
-  [ ['li.selected', {}, 'RxJs'],
-    ['li', {}, 'Bacon.js'],
-    ['li', {}, 'Kefir']]]
+  ['li.selected', {}, 'RxJs'],
+  ['li', {}, 'Bacon.js'],
+  ['li', {}, 'Kefir']]
 ```
 
 The `class`, `props`, `style`, and `eventlistener` modules from Snabbdom are automatically loaded. See: https://github.com/snabbdom/snabbdom#modules-documentation for more information.
