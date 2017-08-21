@@ -63,7 +63,6 @@ function button(action, text) {
   return ['button', { on: { click: e => actions$.next(action) } }, text];
 }
 
-// prettier-ignore
 function view(model) {
   return (
     ['div', {},
